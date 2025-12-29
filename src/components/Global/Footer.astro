@@ -1,11 +1,11 @@
 ---
-import { getCollection } from 'astro:content';
+import { getEntry } from 'astro:content';
 
 // Get the office hours from the siteInfo collection
 let officeHours;
 try {
-  const siteInfoEntries = await getCollection('siteInfo');
-  officeHours = siteInfoEntries.find((entry) => entry.id === 'office-hours');
+  const officeHoursV = await getEntry('siteInfo', 'office-hours');
+  officeHours = officeHoursV;
 } catch (error) {
   // Collection might not exist yet when first setting up the project
   console.log('Office hours not found or collections not yet available.');
@@ -77,7 +77,11 @@ if (officeHours) {
   OfficeHoursContent = Content;
 
   console.log('Office hours content loaded for footer.', officeHours.id);
-  console.log('Frontmatter:', officeHours.data);
+  // console.log('Frontmatter:', officeHours.data);
+  // console.log('File path:', officeHours.filePath);
+  // console.log('Slug:', officeHours.slug);
+  // console.log('Rendered:', officeHours.rendered)
+  // console.log('Body:', officeHours.body);
 } else {
   console.log('No office hours content available. Using default hours.');
 }
