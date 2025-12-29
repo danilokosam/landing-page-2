@@ -74,7 +74,7 @@ const currentYear = new Date().getFullYear();
 let OfficeHoursContent = null;
 if (officeHours) {
   const { Content } = await officeHours.render();
-  OfficeHoursContent = <Content />;
+  OfficeHoursContent = Content;
 
   console.log('Office hours content loaded for footer.', officeHours.id);
   console.log('Frontmatter:', officeHours.data);
