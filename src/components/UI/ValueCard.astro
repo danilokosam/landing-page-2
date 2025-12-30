@@ -1,0 +1,26 @@
+---
+import Icon from '../UI/Icon.astro';
+
+interface Props {
+  title: string; // Title of the value
+  description: string; // Short description of the value
+  colorClass: string; // Background color class for the icon container
+  iconColorClass: string; // Background color class for the icon
+  iconName: string; // Name of the icon to display
+}
+
+const { title, description, colorClass, iconColorClass, iconName } =
+  Astro.props;
+---
+
+<div
+  class='bg-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow'
+>
+  <div
+    class={`w-16 h-16 rounded-full ${colorClass} flex items-center justify-center mb-6`}
+  >
+    <Icon name={iconName} class={`h-8 w-8 ${iconColorClass}`} />
+  </div>
+  <h3 class='text-xl font-bold mb-3'>{title}</h3>
+  <p class='text-gray-700'>{description}</p>
+</div>
