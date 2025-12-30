@@ -90,6 +90,18 @@ const siteInfoCollection = defineCollection({
   }),
 });
 
+const aboutValuesCollection = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    colorClass: z.string(),
+    iconColorClass: z.string(),
+    iconName: z.string(),
+    order: z.number().optional(),
+  }),
+});
+
 export const collections = {
   staff: staffCollection,
   events: eventsCollection,
@@ -97,4 +109,5 @@ export const collections = {
   ministries: ministriesCollection,
   blog: blogCollection,
   siteInfo: siteInfoCollection,
+  aboutValues: aboutValuesCollection,
 };
