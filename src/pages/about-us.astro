@@ -1,10 +1,10 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import PageHeader from '../components/Sections/PageHeader.astro';
-import StaffList from '../components/Sections/StaffList.astro';
-import TimelineItem from '../components/UI/TimelineItem.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PageHeader from '@components/Sections/PageHeader.astro';
+import StaffList from '@components/Sections/StaffList.astro';
+import TimelineItem from '@components/UI/TimelineItem.astro';
 import { getCollection } from 'astro:content';
-import ValueCard from '../components/UI/ValueCard.astro';
+import ValueCard from '@components/UI/ValueCard.astro';
 
 const coreValues = await getCollection('aboutValues');
 const sortedValues = coreValues.sort(
