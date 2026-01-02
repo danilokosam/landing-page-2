@@ -1,37 +1,34 @@
 ---
-export interface Props {
+import type { HTMLAttributes } from 'astro/types';
+interface BaseProps {
   title: string;
   image?: {
     src: string;
     alt: string;
   };
-  dataSeries?: string;
-  dataSpeaker?: string;
-  dataDate?: string;
-  href?: string;
-  className?: string;
   imageLayout?: 'top' | 'background';
 }
+
+type Props =
+  | (BaseProps & HTMLAttributes<'a'> & { href: string })
+  | (BaseProps & HTMLAttributes<'div'> & { href?: never });
 
 const {
   title,
   image,
   href,
-  className = '',
+  class: className = '',
   imageLayout = 'top',
-  dataSeries,
-  dataSpeaker,
-  dataDate,
+  ...rest
 } = Astro.props;
+
 const Element = href ? 'a' : 'div';
 ---
 
 <Element
   href={href}
   aria-label={href ? title : undefined}
-  data-series={dataSeries}
-  data-speaker={dataSpeaker}
-  data-date={dataDate}
+  {...rest}
   class:list={[
     'card group overflow-hidden',
     { relative: imageLayout === 'background' },
@@ -50,7 +47,7 @@ const Element = href ? 'a' : 'div';
           src={image.src}
           alt={image.alt}
           class:list={[
-            'w-full object-cover object-center transition-transform duration-300 group-hover:scale-105',
+            'w-full object-cover transition-transform group-hover:scale-105',
             {
               'h-full': imageLayout === 'background',
               'h-auto': imageLayout === 'top',
