@@ -1,0 +1,141 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PostLayout from '@layouts/PostLayout.astro';
+import Button from '@components/UI/Button.astro';
+import { getCollection } from 'astro:content';
+import { formatDate } from '@utils/dateUtils';
+import Icon from '@components/UI/Icon.astro';
+
+// Generate static paths for all events
+export async function getStaticPaths() {
+  try {
+    const eventEntries = await getCollection('events', ({ data }) => {
+      return import.meta.env.PROD ? !data.draft : true;
+    });
+
+    return eventEntries.map((entry) => ({
+      params: { slug: entry.slug },
+      props: { entry },
+    }));
+  } catch (error) {
+    // If the collection doesn't exist yet, return an empty array
+    return [];
+  }
+}
+
+// Get the event data
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+
+// Format the dates for display
+const formattedDate = formatDate(entry.data.date);
+const formattedEndDate = entry.data.endDate
+  ? formatDate(entry.data.endDate)
+  : null;
+
+// Determine if event is in the future
+const isFutureEvent = new Date(entry.data.date) > new Date();
+---
+
+<BaseLayout
+  title={`${entry.data.title} - Events - Church Name`}
+  description={entry.data.summary}
+  image={{ url: entry.data.image, alt: entry.data.title }}
+  type='article'
+>
+  <PostLayout
+    title={entry.data.title}
+    description={entry.data.summary}
+    image={{ url: entry.data.image, alt: entry.data.title }}
+    date={entry.data.date}
+    tags={entry.data.tags}
+  >
+    <!-- Event Details -->
+    <div class='bg-gray-50 rounded-lg p-6 mb-8'>
+      <div class='grid grid-cols-1 md:grid-cols-2 gap-6'>
+        <div>
+          <h3 class='text-lg font-bold mb-2'>Date & Time</h3>
+          <div class='flex items-start mb-2'>
+            <Icon
+              name='calendar'
+              class='h-5 w-5 mr-2 mt-0.5 text-primary-600'
+            />
+            <div>
+              {
+                formattedEndDate && formattedEndDate !== formattedDate ? (
+                  <p>
+                    {formattedDate} - {formattedEndDate}
+                  </p>
+                ) : (
+                  <p>{formattedDate}</p>
+                )
+              }
+              {entry.data.time && <p>{entry.data.time}</p>}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class='text-lg font-bold mb-2'>Location</h3>
+          <div class='flex items-start'>
+            <Icon
+              name='location'
+              class='h-5 w-5 mr-2 mt-0.5 text-primary-600'
+            />
+            <p>{entry.data.location}</p>
+          </div>
+        </div>
+      </div>
+
+      {
+        isFutureEvent && entry.data.registrationRequired && (
+          <div class='mt-6 pt-6 border-t border-gray-200'>
+            <h3 class='text-lg font-bold mb-3'>Registration</h3>
+            <p class='mb-4'>Registration is required for this event.</p>
+
+            {entry.data.registrationLink ? (
+              <Button
+                href={entry.data.registrationLink}
+                target='_blank'
+                variant='primary'
+              >
+                Register Now
+              </Button>
+            ) : (
+              <Button
+                href='/contact?subject=Event+Registration'
+                variant='primary'
+              >
+                Contact Us to Register
+              </Button>
+            )}
+          </div>
+        )
+      }
+    </div>
+
+    <!-- Event Content -->
+    <Content />
+
+    <!-- Action Buttons -->
+    <div class='mt-12 flex flex-wrap gap-4'>
+      {
+        isFutureEvent && entry.data.registrationLink && (
+          <Button
+            href={entry.data.registrationLink}
+            target='_blank'
+            variant='primary'
+          >
+            Register for This Event
+          </Button>
+        )
+      }
+
+      <Button href='/events' variant='outline'> Back to All Events </Button>
+
+      <Button href='/contact?subject=Event+Inquiry' variant='outline'>
+        Questions? Contact Us
+      </Button>
+    </div>
+  </PostLayout>
+</BaseLayout>
