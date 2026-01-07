@@ -4,6 +4,7 @@ import PageHeader from '@components/Sections/PageHeader.astro';
 import Card from '@components/UI/Card.astro';
 import { getCollection } from 'astro:content';
 import { formatDate } from '@utils/dateUtils';
+import Icon from '@components/UI/Icon.astro';
 
 // Get all blog posts
 const allPosts = await getCollection('blog', ({ data }) => {
@@ -155,38 +156,12 @@ const tags = [...new Set(posts.flatMap((post) => post.data.tags))];
                   data-date={post.data.pubDate.toISOString().slice(0, 10)}
                 >
                   <div class='mb-3 flex items-center text-gray-600'>
-                    <svg
-                      xmlns='http://www.w3.org/2000/svg'
-                      class='h-5 w-5 mr-2'
-                      fill='none'
-                      viewBox='0 0 24 24'
-                      stroke='currentColor'
-                    >
-                      <path
-                        stroke-linecap='round'
-                        stroke-linejoin='round'
-                        stroke-width='2'
-                        d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'
-                      />
-                    </svg>
+                    <Icon name='calendar' class='h-5 w-5 mr-2' />
                     <span>{formatDate(post.data.pubDate)}</span>
                   </div>
 
                   <div class='mb-3 flex items-center text-gray-600'>
-                    <svg
-                      xmlns='http://www.w3.org/2000/svg'
-                      class='h-5 w-5 mr-2'
-                      fill='none'
-                      viewBox='0 0 24 24'
-                      stroke='currentColor'
-                    >
-                      <path
-                        stroke-linecap='round'
-                        stroke-linejoin='round'
-                        stroke-width='2'
-                        d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'
-                      />
-                    </svg>
+                    <Icon name='user' class='h-5 w-5 mr-2' />
                     <span>{post.data.author}</span>
                   </div>
 
