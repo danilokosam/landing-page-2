@@ -1,0 +1,213 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PageHeader from '@components/Sections/PageHeader.astro';
+import Card from '@components/UI/Card.astro';
+import { getCollection } from 'astro:content';
+import { formatDate } from '@utils/dateUtils';
+import Icon from '@components/UI/Icon.astro';
+
+// Get all sermons
+const allSermons = await getCollection('sermons', ({ data }) => {
+  return import.meta.env.PROD ? !data.draft : true;
+});
+
+// Sort by date (newest first)
+const sermons = allSermons.sort(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
+);
+
+// Get unique series and speakers for filters
+const series = [
+  ...new Set(sermons.map((sermon) => sermon.data.series).filter(Boolean)),
+];
+const speakers = [...new Set(sermons.map((sermon) => sermon.data.speaker))];
+---
+
+<BaseLayout
+  title='Sermons - Church Name'
+  description="Listen to or watch our latest sermons. Explore our sermon archive to grow in your faith and understanding of God's Word."
+>
+  <PageHeader
+    title='Sermons'
+    subtitle='Listen to or watch our latest messages'
+    backgroundImage='/uploads/sermons-header-bg.webp'
+  />
+
+  <!-- Sermons List -->
+  <section class='py-16'>
+    <div class='container'>
+      <div class='grid grid-cols-1 lg:grid-cols-4 gap-8'>
+        <!-- Filters Sidebar -->
+        <div class='lg:col-span-1'>
+          <div class='bg-white p-6 rounded-lg shadow-sm sticky top-24'>
+            <h2 class='text-xl font-bold mb-6'>Filter Sermons</h2>
+
+            <!-- Search -->
+            <div class='mb-6'>
+              <label
+                for='search'
+                class='block text-sm font-medium text-gray-700 mb-1'
+                >Search</label
+              >
+              <input
+                type='text'
+                id='search'
+                placeholder='Search sermons...'
+                class='w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500'
+              />
+            </div>
+
+            <!-- Series Filter -->
+            {
+              series.length > 0 && (
+                <div class='mb-6'>
+                  <label
+                    for='series'
+                    class='block text-sm font-medium text-gray-700 mb-1'
+                  >
+                    Series
+                  </label>
+                  <select
+                    id='series'
+                    class='w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500'
+                  >
+                    <option value=''>All Series</option>
+                    {series.map((s) => (
+                      <option value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
+              )
+            }
+
+            <!-- Speaker Filter -->
+            {
+              speakers.length > 0 && (
+                <div class='mb-6'>
+                  <label
+                    for='speaker'
+                    class='block text-sm font-medium text-gray-700 mb-1'
+                  >
+                    Speaker
+                  </label>
+                  <select
+                    id='speaker'
+                    class='w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500'
+                  >
+                    <option value=''>All Speakers</option>
+                    {speakers.map((s) => (
+                      <option value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
+              )
+            }
+
+            <!-- Date Range Filter -->
+            <div class='space-y-3'>
+              <label class='block text-sm font-medium text-gray-700'
+                >Date Range</label
+              >
+
+              <div>
+                <label for='from-date' class='block text-xs text-gray-500 mb-1'
+                  >From</label
+                >
+                <input
+                  type='date'
+                  id='from-date'
+                  class='w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500'
+                />
+              </div>
+
+              <div>
+                <label for='to-date' class='block text-xs text-gray-500 mb-1'
+                  >To</label
+                >
+                <input
+                  type='date'
+                  id='to-date'
+                  class='w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500'
+                />
+              </div>
+            </div>
+
+            <!-- Reset Filters Button -->
+            <button
+              id='reset-filters'
+              class='w-full mt-6 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2'
+            >
+              Reset Filters
+            </button>
+          </div>
+        </div>
+
+        <!-- Sermons Grid -->
+        <div class='lg:col-span-3'>
+          <h2 class='text-2xl font-bold mb-6'>All Sermons</h2>
+
+          <div class='grid grid-cols-1 md:grid-cols-2 gap-8' id='sermons-grid'>
+            {
+              sermons.map((sermon) => (
+                <Card
+                  title={sermon.data.title}
+                  image={{
+                    src:
+                      sermon.data.image || '/uploads/sermon-placeholder.webp',
+                    alt: sermon.data.title,
+                  }}
+                  href={`/sermons/${sermon.slug}`}
+                  class='sermon-card'
+                  data-series={sermon.data.series || ''}
+                  data-speaker={sermon.data.speaker}
+                  data-date={sermon.data.date.toISOString().slice(0, 10)}
+                >
+                  <div class='mb-3 flex items-center text-gray-600'>
+                    <Icon name='calendar' class='h-5 w-5 mr-2' />
+                    <span>{formatDate(sermon.data.date)}</span>
+                  </div>
+
+                  <div class='mb-3 flex items-center text-gray-600'>
+                    <Icon name='user' class='h-5 w-5 mr-2' />
+                    <span>{sermon.data.speaker}</span>
+                  </div>
+
+                  {sermon.data.series && (
+                    <div class='mb-3 flex items-center text-gray-600'>
+                      <Icon name='archive' class='h-5 w-5 mr-2' />
+                      <span>Series: {sermon.data.series}</span>
+                    </div>
+                  )}
+
+                  {sermon.data.scripture && (
+                    <div class='mb-3 flex items-center text-gray-600'>
+                      <Icon name='book' class='h-5 w-5 mr-2' />
+                      <span>{sermon.data.scripture}</span>
+                    </div>
+                  )}
+
+                  <p class='text-gray-700 mb-4'>{sermon.data.summary}</p>
+
+                  <p class='text-primary-600 font-medium group-hover:underline group-hover:text-primary-700'>
+                    Listen/Watch →
+                  </p>
+                </Card>
+              ))
+            }
+          </div>
+
+          <!-- No Results Message (Hidden by default) -->
+          <div
+            id='no-results'
+            class='hidden text-center py-12 bg-gray-50 rounded-lg mt-8'
+          >
+            <p class='text-gray-600'>
+              No sermons match your search criteria. Please try different
+              filters.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
