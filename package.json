@@ -10,6 +10,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@astrojs/vercel": "^9.0.3",
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^5.16.6",
     "date-fns": "^4.1.0",

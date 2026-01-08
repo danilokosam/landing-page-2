@@ -2,10 +2,16 @@
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 
+import vercel from '@astrojs/vercel';
+
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://example.com', // Replace with your site's URL
+  // Replace with your site's URL
+  site: 'https://example.com',
+
   vite: {
     plugins: [tailwindcss()],
   },
+
+  adapter: vercel(),
 });
