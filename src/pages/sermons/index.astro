@@ -210,4 +210,96 @@ const speakers = [...new Set(sermons.map((sermon) => sermon.data.speaker))];
       </div>
     </div>
   </section>
+
+  <script>
+    // Filter functionality
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('search') as HTMLInputElement;
+      const seriesSelect = document.getElementById(
+        'series',
+      ) as HTMLSelectElement | null;
+      const speakerSelect = document.getElementById(
+        'speaker',
+      ) as HTMLSelectElement | null;
+      const fromDateInput = document.getElementById(
+        'from-date',
+      ) as HTMLInputElement;
+      const toDateInput = document.getElementById(
+        'to-date',
+      ) as HTMLInputElement;
+      const resetButton = document.getElementById('reset-filters');
+      const sermonsGrid = document.getElementById('sermons-grid');
+      const noResults = document.getElementById('no-results');
+      const sermonCards = document.querySelectorAll(
+        '.sermon-card',
+      ) as NodeListOf<HTMLElement>;
+
+      // Function to filter sermons
+      const filterSermons = () => {
+        const searchTerm = searchInput?.value.toLowerCase() || '';
+        const selectedSeries = seriesSelect?.value || '';
+        const selectedSpeaker = speakerSelect?.value || '';
+        const fromDate = fromDateInput?.value || '';
+        const toDate = toDateInput?.value || '';
+
+        let visibleCount = 0;
+
+        sermonCards.forEach((card) => {
+          const title =
+            card.querySelector('h3')?.textContent.toLowerCase() || '';
+          const summary =
+            card.querySelector('p')?.textContent.toLowerCase() || '';
+          const series = card.getAttribute('data-series') || '';
+          const speaker = card.getAttribute('data-speaker') || '';
+          const date = card.getAttribute('data-date') || '';
+
+          // Check if sermon matches all filters
+          const matchesSearch =
+            title.includes(searchTerm) || summary.includes(searchTerm);
+          const matchesSeries = !selectedSeries || series === selectedSeries;
+          const matchesSpeaker =
+            !selectedSpeaker || speaker === selectedSpeaker;
+          const matchesFromDate = !fromDate || date >= fromDate;
+          const matchesToDate = !toDate || date <= toDate;
+
+          // Show/hide the sermon card
+          if (
+            matchesSearch &&
+            matchesSeries &&
+            matchesSpeaker &&
+            matchesFromDate &&
+            matchesToDate
+          ) {
+            card.style.display = 'block';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        // Show/hide no results message
+        if (noResults) {
+          noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+      };
+
+      // Add event listeners
+      searchInput?.addEventListener('input', filterSermons);
+      seriesSelect?.addEventListener('change', filterSermons);
+      speakerSelect?.addEventListener('change', filterSermons);
+      fromDateInput?.addEventListener('change', filterSermons);
+      toDateInput?.addEventListener('change', filterSermons);
+
+      // Reset filters
+      resetButton?.addEventListener('click', () => {
+        if (searchInput) searchInput.value = '';
+        if (seriesSelect) seriesSelect.value = '';
+        if (speakerSelect) speakerSelect.value = '';
+        if (fromDateInput) fromDateInput.value = '';
+        if (toDateInput) toDateInput.value = '';
+
+        filterSermons();
+      });
+    });
+  </script>
 </BaseLayout>
